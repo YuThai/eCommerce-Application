@@ -15,7 +15,7 @@ COPY eCommersApp/src ./src
 RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime image
-FROM eclipse-temurin:17-jdk-slim
+FROM amazoncorretto:17-alpine
 
 WORKDIR /app
 
