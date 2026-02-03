@@ -1,7 +1,6 @@
 package Ecom.SecurityConfig;
 
 import java.io.IOException;
-
 import javax.crypto.SecretKey;
 
 import org.springframework.security.authentication.BadCredentialsException;
@@ -21,41 +20,50 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-			throws ServletException, IOException {
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-		String jwt = request.getHeader(SecurityConstants.JWT_HEADER);
+        // 1. Ưu tiên lấy Token từ URL (Query String: ?accessToken=...)
+        String jwt = request.getParameter("accessToken");
 
-		if (jwt != null) {
-			try {
-				jwt = jwt.substring(7);
-				SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes());
+        // 2. Nếu URL không có, thì mới lấy từ Header (Authorization: Bearer ...)
+        if (jwt == null) {
+            String authHeader = request.getHeader(SecurityConstants.JWT_HEADER);
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                jwt = authHeader.substring(7); // Cắt bỏ chữ "Bearer "
+            }
+        }
 
-				Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
-				
-				String username = String.valueOf(claims.get("username"));
+        // 3. Tiến hành kiểm tra Token
+        if (jwt != null) {
+            try {
+                // Lưu ý: Token lấy từ URL thường không có chữ "Bearer " nên không cần cắt chuỗi nữa
+                // Code cũ của bạn cắt chuỗi ở đây, nhưng tôi đã xử lý logic cắt ở bước 2 rồi.
+                
+                SecretKey key = Keys.hmacShaKeyFor(SecurityConstants.JWT_KEY.getBytes());
 
-				String authorities = (String) claims.get("authorities");
+                Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(jwt).getBody();
 
-				Authentication auth = new UsernamePasswordAuthenticationToken(username, null,
-						AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                String username = String.valueOf(claims.get("username"));
+                String authorities = (String) claims.get("authorities");
 
-				SecurityContextHolder.getContext().setAuthentication(auth);
+                Authentication auth = new UsernamePasswordAuthenticationToken(username, null,
+                        AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
 
-			} catch (Exception e) {
-				throw new BadCredentialsException("Invalid Token received..");
-			}
+                SecurityContextHolder.getContext().setAuthentication(auth);
 
-		}
+            } catch (Exception e) {
+                // Có thể log lỗi ra đây để debug nếu cần
+                throw new BadCredentialsException("Invalid Token received..");
+            }
+        }
 
-		filterChain.doFilter(request, response);
-	}
+        filterChain.doFilter(request, response);
+    }
 
-	@Override
-	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-
-		return request.getServletPath().equals("/ecom/signIn");
-	}
-
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return request.getServletPath().equals("/ecom/signIn");
+    }
 }

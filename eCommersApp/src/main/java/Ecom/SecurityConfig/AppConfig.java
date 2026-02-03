@@ -51,8 +51,9 @@ public class AppConfig {
                             .requestMatchers(HttpMethod.POST, "/ecom/admin").permitAll()
                             .requestMatchers(HttpMethod.POST, "/ecom/customers").permitAll()
                             .requestMatchers(HttpMethod.DELETE, "/ecom/orders/users/**").permitAll()
-                            .requestMatchers(HttpMethod.GET, "/ecom/signIn", "/ecom/product-reviews/**","/ecom/products/**").permitAll()
-
+                            .requestMatchers(HttpMethod.GET, "/ecom/product-reviews/**","/ecom/products/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/ecom/signIn").authenticated()
+                                .requestMatchers(HttpMethod.POST, "ecom/products/insert").permitAll()
                             .requestMatchers(
                                     HttpMethod.POST,
                                     "/ecom/product/**",

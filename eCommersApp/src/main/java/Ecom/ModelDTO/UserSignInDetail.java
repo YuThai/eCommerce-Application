@@ -10,5 +10,5 @@ public class UserSignInDetail {
     String firstNAme;
     String lastName;
     String signinStatus;
-
+    String token;
 }

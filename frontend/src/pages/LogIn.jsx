@@ -42,7 +42,7 @@ const Login = () => {
       const authHeader = `Basic ${btoa(`${form.username}:${form.password}`)}`;
       const response = await axios.get("http://localhost:8080/ecom/signIn", {
         headers: {
-          Authorization: authHeader,
+          Authorization: `Basic ${btoa(`${form.username}:${form.password}`)}`
         },
       });
       //console.log(response.data);

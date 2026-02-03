@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import Ecom.Service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.nio.channels.ScatteringByteChannel;
 
@@ -21,15 +22,21 @@ public class LoginController {
 	private UserService userService;
 
 	@GetMapping("/signIn")
-	public ResponseEntity<UserSignInDetail> getLoggedInCustomerDetailsHandler(Authentication auth) {
-		try {var customer = userService.getUserByEmailId(auth.getName());
+	public ResponseEntity<UserSignInDetail> getLoggedInCustomerDetailsHandler(Authentication auth, HttpServletRequest request) {
+		try {
+			var customer = userService.getUserByEmailId(auth.getName());
 			UserSignInDetail signinSuceesData = new UserSignInDetail();
 			signinSuceesData.setId(customer.getUserId());
 			signinSuceesData.setFirstNAme(customer.getFirstName());
 			signinSuceesData.setLastName(customer.getLastName());
 			signinSuceesData.setSigninStatus("Success");
+			
+			// Lấy token từ request attribute (được set bởi JwtTokenGeneratorFilter)
+			String token = (String) request.getAttribute("jwtToken");
+			signinSuceesData.setToken(token);
 
-			return new ResponseEntity<>(signinSuceesData, HttpStatus.OK);}
+			return new ResponseEntity<>(signinSuceesData, HttpStatus.OK);
+		}
 		catch(UserException ex ){
 			throw new UserException(" Invalid Password");
 		}
