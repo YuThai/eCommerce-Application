@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import Ecom.Repository.UserRepository;
 
-@Service
+@Service("customUserDetailsService")
 public class CustomerUserDetailsService implements UserDetailsService {
 
 	private final UserRepository userRepository;
