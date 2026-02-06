@@ -85,6 +85,12 @@
             <version>2.0.2</version>
         </dependency>
 
+        <!-- Actuator (for health checks) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
         <!-- Lombok (FIX LỖI JDK 17) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
