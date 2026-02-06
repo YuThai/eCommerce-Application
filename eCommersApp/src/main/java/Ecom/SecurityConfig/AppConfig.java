@@ -55,6 +55,7 @@ public class AppConfig {
                             .requestMatchers(new AntPathRequestMatcher("/ecom/product-reviews/**", HttpMethod.GET.name())).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/ecom/products/**", HttpMethod.GET.name())).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/ecom/signIn", HttpMethod.GET.name())).authenticated()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/auth/login", HttpMethod.POST.name())).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("ecom/products/insert", HttpMethod.POST.name())).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/ecom/product/**", HttpMethod.POST.name())).hasRole("ADMIN")
                             .requestMatchers(new AntPathRequestMatcher("/ecom/order-shippers/**", HttpMethod.POST.name())).hasRole("ADMIN")
