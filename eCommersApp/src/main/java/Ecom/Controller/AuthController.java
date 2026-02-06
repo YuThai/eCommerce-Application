@@ -93,7 +93,7 @@ public class AuthController {
             String refreshToken = tokenProvider.generateRefreshToken(loginRequest.getEmail());
 
             // Get user permissions for metadata
-            List<UserPermission> permissions = permissionRepository.findByUserIdAndActiveTrue(user.getId());
+            List<UserPermission> permissions = permissionRepository.findByUserIdAndActiveTrue((long) user.getUserId());
 
             AuthResponse response = AuthResponse.builder()
                     .accessToken(accessToken)
@@ -101,7 +101,7 @@ public class AuthController {
                     .tokenType("Bearer")
                     .expiresIn(900000L) // 15 minutes
                     .refreshExpiresIn(604800000L) // 7 days
-                    .userId(user.getId())
+                    .userId((long) user.getUserId())
                     .username(user.getEmail())
                     .role(String.valueOf(user.getRole()))
                     .middlewareCompatible(true)
@@ -147,7 +147,7 @@ public class AuthController {
 
             // Create new authentication for token generation
             Authentication authentication = new UsernamePasswordAuthenticationToken(
-                    username, null, user.getAuthorities()
+                    username, null, Collections.emptyList()
             );
 
             // Generate new access token
@@ -158,7 +158,7 @@ public class AuthController {
                     .refreshToken(request.getRefreshToken())
                     .tokenType("Bearer")
                     .expiresIn(900000L)
-                    .userId(user.getId())
+                    .userId((long) user.getUserId())
                     .username(username)
                     .message("Token refreshed successfully")
                     .build();
@@ -190,10 +190,10 @@ public class AuthController {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        List<UserPermission> permissions = permissionRepository.findByUserIdAndActiveTrue(user.getId());
+        List<UserPermission> permissions = permissionRepository.findByUserIdAndActiveTrue((long) user.getUserId());
 
         Map<String, Object> response = new HashMap<>();
-        response.put("userId", user.getId());
+        response.put("userId", user.getUserId());
         response.put("email", user.getEmail());
         response.put("role", user.getRole());
         response.put("permissions", permissions.stream()
@@ -228,7 +228,7 @@ public class AuthController {
                         .body(Collections.singletonMap("error", "Only ADMIN can grant permissions"));
             }
 
-            Long userId = Long.valueOf(request.get("userId").toString());
+            Integer userId = Integer.valueOf(request.get("userId").toString());
             String resourceName = request.get("resourceName").toString();
             String permissionType = request.get("permissionType").toString();
 
