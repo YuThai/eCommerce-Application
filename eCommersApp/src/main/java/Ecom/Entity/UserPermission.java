@@ -1,5 +1,6 @@
 package Ecom.Entity;
 
+import Ecom.Model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

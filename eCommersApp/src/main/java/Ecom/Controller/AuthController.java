@@ -3,7 +3,7 @@ package Ecom.Controller;
 import Ecom.DTO.AuthResponse;
 import Ecom.DTO.LoginRequest;
 import Ecom.DTO.RefreshTokenRequest;
-import Ecom.Entity.User;
+import Ecom.Model.User;
 import Ecom.Entity.UserPermission;
 import Ecom.Repository.UserPermissionRepository;
 import Ecom.Repository.UserRepository;
