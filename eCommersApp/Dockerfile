@@ -1,36 +1,44 @@
-# Multi-stage build để tối ưu kích thước image
-# Stage 1: Build application
-FROM maven:3.8.1-openjdk-17 AS builder
+# Multi-stage Dockerfile for optimized Render.com deployment
+
+# Stage 1: Build
+FROM maven:3.9.2-eclipse-temurin-17 AS builder
 
 WORKDIR /app
 
-# Copy pom.xml và download dependencies
+# Copy pom.xml and download dependencies
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy source code
 COPY src ./src
 
-# Build ứng dụng
-RUN mvn clean package -DskipTests
+# Build application
+RUN mvn clean package -DskipTests -P prod
 
-# Stage 2: Runtime image
-FROM openjdk:17-jdk-slim
+# Stage 2: Runtime
+FROM eclipse-temurin:17-jre-alpine
 
 WORKDIR /app
 
-# Copy JAR từ stage 1
-COPY --from=builder /app/target/*.jar app.jar
+# Install curl for health checks
+RUN apk add --no-cache curl
 
-# Expose port (mặc định Spring Boot chạy ở 8080)
-EXPOSE 8080
+# Copy JAR from builder stage
+COPY --from=builder /app/target/Ecom-0.0.1-SNAPSHOT.jar app.jar
+
+# Create non-root user for security
+RUN addgroup -g 1001 appuser && \
+    adduser -u 1001 -G appuser -s /sbin/nologin appuser
+
+RUN chown -R appuser:appuser /app
+USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD java -cp app.jar -Dspring.profiles.active=production \
-  -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.authenticate=false \
-  -Dcom.sun.management.jmxremote.ssl=false \
-  org.springframework.boot.loader.JarLauncher
+  CMD curl -f http://localhost:${PORT:-8080}/actuator/health || exit 1
 
-# Run ứng dụng
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Expose port
+EXPOSE ${PORT:-8080}
+
+# Run application with production profile
+ENTRYPOINT ["java", "-Xmx256m", "-Xms128m", "-XX:+UseG1GC", "-XX:+UseStringDeduplication", "-Dspring.profiles.active=prod", "-jar", "app.jar"]
