@@ -85,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private Claims extractTokenClaims(String token) {
         return Jwts.parser()
-                .setSigningKey(SecurityConstants.JWT_KEY)
+                .setSigningKey(SecurityConstants.JWT_KEY.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
     }

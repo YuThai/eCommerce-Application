@@ -64,6 +64,11 @@ public class JwtTokenValidatorFilter extends OncePerRequestFilter {
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
-        return request.getServletPath().equals("/ecom/signIn");
+        String path = request.getServletPath();
+        return path.equals("/ecom/signIn") || 
+               path.startsWith("/ecom/auth/") ||
+               path.startsWith("/ecom/customers") ||
+               path.startsWith("/ecom/products") ||
+               path.startsWith("/actuator");
     }
 }
