@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "../comp_css/Login.css";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import { loginUser } from "../Router/api";
 import loginbg from "../picture/loginbg1.webp";
 
 const bg = {
@@ -14,7 +14,7 @@ const bg = {
 };
 
 const formData = {
-  username: "",
+  email: "",
   password: "",
 };
 
@@ -39,17 +39,9 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      const authHeader = `Basic ${btoa(`${form.username}:${form.password}`)}`;
-      const response = await axios.get("http://localhost:8080/ecom/signIn", {
-        headers: {
-          Authorization: `Basic ${btoa(`${form.username}:${form.password}`)}`
-        },
-      });
-      //console.log(response.data);
-      if (response.headers.authorization != undefined) {
-        localStorage.setItem("jwtToken", response.headers.authorization);
-        localStorage.setItem("name", response.data.firstNAme || "LogIn");
-        localStorage.setItem("userid", response.data.id);
+      const response = await loginUser(form.email, form.password);
+      if (response && response.accessToken) {
+        localStorage.setItem("name", form.email || "LogIn");
         alert("Login successfully");
         navigate("/");
       } else {
@@ -57,8 +49,8 @@ const Login = () => {
         console.error("JWT retrieval failed");
       }
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        alert("Invalid credentials. Please try again.");
+      if (error && typeof error === "object" && error.message) {
+        alert(error.message);
       } else {
         alert("Error during login. Please try again later.");
         console.error("Error during login:", error);
@@ -66,7 +58,7 @@ const Login = () => {
     }
   };
 
-  const { username, password } = form;
+  const { email, password } = form;
 
   return (
     <>
@@ -79,12 +71,12 @@ const Login = () => {
           <h2 style={{ textAlign: "center" }}>LogIn </h2>
           <form onSubmit={submitHandler}>
             <div className="form-group">
-              <label htmlFor="username">Username:</label>
+              <label htmlFor="email">Email:</label>
               <input
-                id="username"
+                id="email"
                 type="text"
-                name="username"
-                value={username}
+                name="email"
+                value={email}
                 onChange={setHandlerChange}
               />
             </div>
