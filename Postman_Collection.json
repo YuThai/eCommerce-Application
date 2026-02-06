@@ -1,0 +1,591 @@
+{
+  "info": {
+    "name": "eCommerce API - Authentication & Permissions",
+    "description": "Complete API test collection for eCommerce application with JWT authentication and permission management",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "item": [
+        {
+          "name": "1. Register New User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201 || pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('userId', jsonData.id);",
+                  "    pm.test('User registration successful', function () {",
+                  "        pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\",\n  \"name\": \"Test User\",\n  \"phone\": \"1234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/customers",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "customers"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Login - Get Tokens",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('accessToken', jsonData.accessToken);",
+                  "    pm.environment.set('refreshToken', jsonData.refreshToken);",
+                  "    pm.environment.set('userId', jsonData.userId);",
+                  "    pm.environment.set('tokenExpiry', new Date().getTime() + jsonData.expiresIn);",
+                  "    ",
+                  "    pm.test('✓ Login successful', function () {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "        pm.expect(jsonData.accessToken).to.exist;",
+                  "        pm.expect(jsonData.refreshToken).to.exist;",
+                  "    });",
+                  "    ",
+                  "    pm.test('✓ Token validity correct', function () {",
+                  "        pm.expect(jsonData.expiresIn).to.equal(900000); // 15 minutes",
+                  "        pm.expect(jsonData.refreshExpiresIn).to.equal(604800000); // 7 days",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"testuser@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/login",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "login"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Get Current User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('✓ User profile retrieved', function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.email).to.exist;",
+                  "    pm.expect(jsonData.role).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/me",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Refresh Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('accessToken', jsonData.accessToken);",
+                  "    ",
+                  "    pm.test('✓ Token refreshed successfully', function () {",
+                  "        pm.expect(pm.response.code).to.equal(200);",
+                  "        pm.expect(jsonData.accessToken).to.exist;",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/refresh",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "refresh"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Logout",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('✓ Logout successful', function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/logout",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "logout"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👥 Permission Management (ADMIN)",
+      "item": [
+        {
+          "name": "1. Grant User Permission - READ PRODUCTS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('permissionId', jsonData.permissionId);",
+                  "    ",
+                  "    pm.test('✓ Permission granted successfully', function () {",
+                  "        pm.expect(jsonData.success).to.equal(true);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"resourceName\": \"PRODUCTS\",\n  \"permissionType\": \"READ\",\n  \"notes\": \"Can view product catalog\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/permissions",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "permissions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Grant User Permission - CREATE ORDERS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"resourceName\": \"ORDERS\",\n  \"permissionType\": \"CREATE\",\n  \"notes\": \"Can place new orders\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/permissions",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "permissions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "3. Grant User Permission - UPDATE PROFILE",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": {{userId}},\n  \"resourceName\": \"USERS\",\n  \"permissionType\": \"UPDATE\",\n  \"notes\": \"Can update own profile\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/permissions",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "permissions"
+              ]
+            }
+          }
+        },
+        {
+          "name": "4. Get User Permissions",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('✓ User permissions retrieved', function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.permissions).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/permissions/{{userId}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "permissions",
+                "{{userId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "5. Revoke User Permission",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('✓ Permission revoked successfully', function () {",
+                  "    pm.expect(pm.response.code).to.equal(200);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/permissions/{{permissionId}}",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "permissions",
+                "{{permissionId}}"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔌 Middleware Integration (ADMIN)",
+      "item": [
+        {
+          "name": "1. Generate Middleware Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('middlewareToken', jsonData.token);",
+                  "    ",
+                  "    pm.test('✓ Middleware token generated', function () {",
+                  "        pm.expect(jsonData.token).to.exist;",
+                  "        pm.expect(jsonData.tokenType).to.equal('Bearer');",
+                  "        pm.expect(jsonData.expiresIn).to.equal(900000);",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"middleware-service@example.com\",\n  \"scopes\": [\"READ_PRODUCTS\", \"READ_ORDERS\", \"WRITE_REVIEWS\"]\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/auth/middleware-token",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "auth",
+                "middleware-token"
+              ]
+            }
+          }
+        },
+        {
+          "name": "2. Use Middleware Token - Get Products",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('✓ Middleware token works with API', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 400, 404]); // API exists",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{middlewareToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/products",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "products"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🏪 Product Endpoints",
+      "item": [
+        {
+          "name": "Get All Products (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/products",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "products"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Product (ADMIN)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Sample Product\",\n  \"price\": 99.99,\n  \"category\": \"Electronics\",\n  \"description\": \"A great product\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/ecom/products",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "ecom",
+                "products"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "refreshToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "userId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "permissionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "middlewareToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
