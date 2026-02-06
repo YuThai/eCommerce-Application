@@ -22,7 +22,7 @@ const getApiBaseUrl = () => {
   
   if (env === 'production') {
     // For production, use Render backend URL
-    return process.env.REACT_APP_API_URL || 'https://your-ecommerce-api.onrender.com';
+    return process.env.REACT_APP_API_URL || 'https://ecommerce-backend-kf68.onrender.com';
   }
   
   // Development environment
