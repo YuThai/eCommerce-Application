@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -35,12 +36,12 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authz -> authz
-                    // Public endpoints
-                    .requestMatchers(HttpMethod.POST, "/ecom/auth/login").permitAll()
-                    .requestMatchers(HttpMethod.POST, "/ecom/customers").permitAll()
-                    .requestMatchers(HttpMethod.GET, "/ecom/products/**").permitAll()
-                    .requestMatchers("/actuator/**").permitAll()
-                    .requestMatchers("/actuator/health/**").permitAll()
+                    // Public endpoints - using AntPathRequestMatcher
+                    .requestMatchers(new AntPathRequestMatcher("/ecom/auth/login", HttpMethod.POST.name())).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/ecom/customers", HttpMethod.POST.name())).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/ecom/products/**", HttpMethod.GET.name())).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/actuator/health/**")).permitAll()
                     // Protected endpoints
                     .anyRequest().authenticated()
                 )
