@@ -33,11 +33,18 @@ public class AppConfig {
 
                             CorsConfiguration cfg = new CorsConfiguration();
 
-                            cfg.setAllowedOriginPatterns(Collections.singletonList("*"));
-                            cfg.setAllowedOriginPatterns(Collections.singletonList("https://eccomers96.netlify.app/"));
-                            cfg.setAllowedOriginPatterns(Collections.singletonList("http://localhost:3000"));
-                            cfg.setAllowedMethods(Collections.singletonList("*"));
-        
+                            String allowedOrigins = System.getenv("CORS_ORIGINS");
+                            if (allowedOrigins != null && !allowedOrigins.isEmpty()) {
+                                cfg.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+                            } else {
+                                cfg.setAllowedOrigins(Arrays.asList(
+                                    "http://localhost:3000",
+                                    "http://localhost:3001",
+                                    "https://eccomers96.netlify.app"
+                                ));
+                            }
+
+                            cfg.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
                             cfg.setAllowCredentials(true);
                             cfg.setAllowedHeaders(Collections.singletonList("*"));
                             cfg.setExposedHeaders(Arrays.asList("Authorization"));
