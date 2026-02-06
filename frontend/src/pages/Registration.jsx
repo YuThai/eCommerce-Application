@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../comp_css/Login.css";
 import { useNavigate,Link } from "react-router-dom";
-import axios from 'axios';
+import { registerUser } from "../Router/api";
 import loginbg from "../picture/loginbg.webp";
 //import loginbg from "../picture/registerbg.jpg";
 
@@ -35,17 +35,17 @@ const Registration = () => {
     e.preventDefault();
   
     try {
-      const response = await axios.post("http://localhost:8080/ecom/customers", form);
+      const response = await registerUser(form);
       
-      if (response.status === 200) {
+      if (response) {
         alert("Your registration was successful");
         navigate("/login");
       } else {
         console.error("Registration failed");
       }
     } catch (error) {
-      if (error.response && error.response.data) {
-        alert(error.response.data.message); 
+      if (error && typeof error === 'object' && error.message) {
+        alert(error.message); 
       } else {
         alert("Error registering. Please try again later.");
         console.error("Error registering:", error);
