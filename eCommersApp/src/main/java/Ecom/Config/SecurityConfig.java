@@ -40,6 +40,8 @@ public class SecurityConfig {
                     .requestMatchers(new AntPathRequestMatcher("/ecom/auth/login", HttpMethod.POST.name())).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/ecom/customers", HttpMethod.POST.name())).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/ecom/products/**", HttpMethod.GET.name())).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
+                    .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/actuator/**")).permitAll()
                     .requestMatchers(new AntPathRequestMatcher("/actuator/health/**")).permitAll()
                     // Protected endpoints

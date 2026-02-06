@@ -80,6 +80,8 @@ public class AppConfig {
                             .requestMatchers(new AntPathRequestMatcher("/ecom/orders/**", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
                             .requestMatchers(new AntPathRequestMatcher("/ecom/order-shippers", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
                             .requestMatchers(new AntPathRequestMatcher("/ecom/order-payments/**", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/swagger-ui*/**")).permitAll()
                             .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                             .anyRequest().authenticated();
