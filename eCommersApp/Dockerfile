@@ -26,9 +26,9 @@ RUN apk add --no-cache curl
 # Copy JAR from builder stage
 COPY --from=builder /app/target/Ecom-0.0.1-SNAPSHOT.jar app.jar
 
-# Create non-root user for security
+# Create non-root user for security (Alpine Linux)
 RUN addgroup -g 1001 appuser && \
-    adduser -u 1001 -G appuser -s /sbin/nologin appuser
+    adduser -D -u 1001 -G appuser -s /sbin/nologin appuser
 
 RUN chown -R appuser:appuser /app
 USER appuser
