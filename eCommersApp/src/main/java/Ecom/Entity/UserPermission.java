@@ -65,6 +65,9 @@ public class UserPermission {
      * Last modified timestamp
      */
     @Column(name = "updated_at")
+    private Long updatedAt;
+    
+    public enum PermissionType {
         CREATE,
         READ,
         UPDATE,
