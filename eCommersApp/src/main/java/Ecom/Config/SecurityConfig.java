@@ -33,19 +33,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .cors().and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests()
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authz -> authz
                     // Public endpoints
-                    .antMatchers(HttpMethod.POST, "/ecom/auth/login").permitAll()
-                    .antMatchers(HttpMethod.POST, "/ecom/customers").permitAll()
-                    .antMatchers(HttpMethod.GET, "/ecom/products/**").permitAll()
-                    .antMatchers("/actuator/**").permitAll()
-                    .antMatchers("/actuator/health/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/ecom/auth/login").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/ecom/customers").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/ecom/products/**").permitAll()
+                    .requestMatchers("/actuator/**").permitAll()
+                    .requestMatchers("/actuator/health/**").permitAll()
                     // Protected endpoints
                     .anyRequest().authenticated()
-                .and()
+                )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
