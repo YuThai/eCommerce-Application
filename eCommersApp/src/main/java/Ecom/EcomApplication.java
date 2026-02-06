@@ -12,6 +12,10 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.annotations.security.SecuritySchemes;
 import io.swagger.v3.oas.annotations.servers.Server;
 
+/**
+ * E-Commerce Application
+ * Build: 2026-02-06 v2
+ */
 @EntityScan(basePackages = "Ecom")
 @SpringBootApplication
 @OpenAPIDefinition(info = @Info(title = "REST API", version = "1.1"), security = {
