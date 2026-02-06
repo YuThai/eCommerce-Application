@@ -33,39 +33,38 @@ public class UserPermission {
     /**
      * Resource name: PRODUCTS, ORDERS, USERS, PAYMENTS, etc.
      */
-    @Column(nullable = false)
+    @Column(name = "resource_name", nullable = false)
     private String resourceName;
-    
+
     /**
      * Permission type: CREATE, READ, UPDATE, DELETE, EXPORT
      */
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "permission_type", nullable = false)
     private PermissionType permissionType;
-    
+
     /**
      * Whether this permission is active
      */
-    @Column(nullable = false)
+    @Column(name = "active", nullable = false)
     private Boolean active = true;
-    
+
     /**
      * Notes about this permission (for audit purposes)
      */
+    @Column(name = "notes")
     private String notes;
-    
+
     /**
      * When this permission was granted
      */
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private Long createdAt = System.currentTimeMillis();
-    
+
     /**
      * Last modified timestamp
      */
-    private Long updatedAt;
-    
-    public enum PermissionType {
+    @Column(name = "updated_at")
         CREATE,
         READ,
         UPDATE,
