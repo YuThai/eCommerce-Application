@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
@@ -48,70 +49,39 @@ public class AppConfig {
                 })
                 .authorizeHttpRequests(auth -> {
                     auth
-                            .requestMatchers(HttpMethod.POST, "/ecom/admin").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/ecom/customers").permitAll()
-                            .requestMatchers(HttpMethod.DELETE, "/ecom/orders/users/**").permitAll()
-                            .requestMatchers(HttpMethod.GET, "/ecom/product-reviews/**","/ecom/products/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/ecom/signIn").authenticated()
-                                .requestMatchers(HttpMethod.POST, "ecom/products/insert").permitAll()
-                            .requestMatchers(
-                                    HttpMethod.POST,
-                                    "/ecom/product/**",
-                                    "/ecom/order-shippers/**"
-
-                            ).hasRole("ADMIN")
-                            .requestMatchers(
-                                    HttpMethod.POST,
-                                    "/ecom/product/**",
-                                    "/ecom/product-reviews/**",
-                                    "/ecom/customer-addresses/**",
-                                    "/ecom/cart/**",
-                                    "/ecom/orders/**",
-                                    "/ecom/order-shipping/**"
-                            ).hasRole("USER")
-                            .requestMatchers(
-                                    HttpMethod.PUT,
-                                    "/ecom/admin/**",
-                                    "/ecom/products/**"
-
-                            ).hasRole("ADMIN")
-                            .requestMatchers(
-                                    HttpMethod.PUT,
-                                    "/ecom/admin/**",
-                                    "/ecom/product-reviews/**",
-                                    "/ecom/customer-addresses/update/**",
-                                    "/ecom/cart/**", "/ecom/order-shipping/**"
-
-                            ).hasRole("USER")
-
-                            .requestMatchers(
-                                    HttpMethod.DELETE,
-                                    "/ecom/products/**",
-                                    "/ecom/product-reviews/**",
-                                    "/ecom/customer-addresses/delete/**",
-//                                    "/ecom/orders/users/**",
-                                    "/ecom/order-shipping/**",
-                                    "/ecom/order-shippers/**"
-
-                            ).hasRole("ADMIN")
-                            .requestMatchers(
-                                    HttpMethod.DELETE,
-                                    "/ecom/cart/remove-product/**"
-//                                    "/ecom/orders/users/**"
-                            ).hasRole("USER")
-
-                            .requestMatchers(
-                                    HttpMethod.GET,
-
-                                    "/ecom/customer-addresses/**",
-                                    "/ecom/cart/products/**",
-                                    "/ecom/orders/**",
-                                    "/ecom/order-shippers",
-                                    "/ecom/order-payments/**"
-
-                            ).hasAnyRole("ADMIN", "USER")
-
-                            .requestMatchers("/swagger-ui*/**", "/v3/api-docs/**").permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/admin", HttpMethod.POST.name())).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/customers", HttpMethod.POST.name())).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/orders/users/**", HttpMethod.DELETE.name())).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/product-reviews/**", HttpMethod.GET.name())).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/products/**", HttpMethod.GET.name())).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/signIn", HttpMethod.GET.name())).authenticated()
+                            .requestMatchers(new AntPathRequestMatcher("ecom/products/insert", HttpMethod.POST.name())).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/product/**", HttpMethod.POST.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/order-shippers/**", HttpMethod.POST.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/product-reviews/**", HttpMethod.POST.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/customer-addresses/**", HttpMethod.POST.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/cart/**", HttpMethod.POST.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/orders/**", HttpMethod.POST.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/order-shipping/**", HttpMethod.POST.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/admin/**", HttpMethod.PUT.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/products/**", HttpMethod.PUT.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/product-reviews/**", HttpMethod.PUT.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/customer-addresses/update/**", HttpMethod.PUT.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/cart/**", HttpMethod.PUT.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/order-shipping/**", HttpMethod.PUT.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/products/**", HttpMethod.DELETE.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/product-reviews/**", HttpMethod.DELETE.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/customer-addresses/delete/**", HttpMethod.DELETE.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/order-shipping/**", HttpMethod.DELETE.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/order-shippers/**", HttpMethod.DELETE.name())).hasRole("ADMIN")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/cart/remove-product/**", HttpMethod.DELETE.name())).hasRole("USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/customer-addresses/**", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/cart/products/**", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/orders/**", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/order-shippers", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(new AntPathRequestMatcher("/ecom/order-payments/**", HttpMethod.GET.name())).hasAnyRole("ADMIN", "USER")
+                            .requestMatchers(new AntPathRequestMatcher("/swagger-ui*/**")).permitAll()
+                            .requestMatchers(new AntPathRequestMatcher("/v3/api-docs/**")).permitAll()
                             .anyRequest().authenticated();
                 })
                 .csrf(csrf -> csrf.disable())
