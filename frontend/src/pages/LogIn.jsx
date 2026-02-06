@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../Router/api";
 import loginbg from "../picture/loginbg1.webp";
 
+// Using centralized API client for production deployment
 const bg = {
   backgroundImage: `url(${loginbg})`,
   backgroundSize: "cover",
